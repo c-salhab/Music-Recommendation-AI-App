@@ -1,7 +1,7 @@
 # 🎵 MOODIFY 🎵
-Music Recommendation AI App with Flutter, OpenAI, Spotify - Projet Annuel 4IABD1 ESGI
+Music Recommendation AI App with Flutter, OpenAI, Spotify - Projet Annuel 4IABD1 ESGI "Moodify"
 
-A mobile app that recommends music playlists based on the mood and genres selected by the user. This app leverages the power of Flutter for the frontend, OpenAI API for intelligent music recommendations, and Spotify and Audiomack for seamless playlist creation and management.
+A mobile app that recommends music playlists based on the mood and genres selected by the user. This app leverages the power of Flutter for the frontend, OpenAI API for intelligent music recommendations, and Spotify for seamless playlist creation and management.
 
 📋 Key Features:
 1. 🎭 Single-select mood category 
@@ -13,7 +13,6 @@ A mobile app that recommends music playlists based on the mood and genres select
 - Flutter
 - OpenAI / OpenAI API
 - Spotify / Spotify API / Spotipy
-- Audiomack / Audiomack API
 
 📚 Project Scope: This project was completed as part of the annual project for the 4th year at ESGI.
 

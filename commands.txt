@@ -1,0 +1,7 @@
+Commands to launch to use Virtual Device on VS code
+
+flutter devices
+flutter emulators
+flutter emulators --launch <emulator_id>
+flutter run
+
