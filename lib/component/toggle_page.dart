@@ -12,14 +12,15 @@ class TogglePage extends StatefulWidget {
 class _TogglePageState extends State<TogglePage> {
   bool _showHomeScreen = true;
 
-  void _toggleScreen(){
+  void _toggleScreen() {
     setState(() {
       _showHomeScreen = !_showHomeScreen;
     });
   }
+
   @override
   Widget build(BuildContext context) {
-    if (_showHomeScreen){
+    if (_showHomeScreen) {
       return HomeScreen(
         showPromptScreen: _toggleScreen,
       );
