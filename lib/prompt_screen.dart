@@ -75,8 +75,36 @@ class _PromptScreenState extends State<PromptScreen> {
       _isLoading = true;
     });
 
+    // Construct the prompt text using the selected mood and genres
+    final promptText = 'I want just a listed music playlist for'
+        'Mood: $_selectedMood, Genres: ${_selectedGenres.join(', ')}'
+        'in the format artist, title';
+
+    // print(dotenv.env['token']);
+
+    // API call to get playlist recommendations
+    // final response = await http.post(
+    //   Uri.parse('https://api.openai.com/v1/chat/completions'),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer ${dotenv.env['token']}',
+    //   },
+    //   body: jsonEncode(
+    //     {
+    //       "model": "gpt-3.5-turbo-0125",
+    //       "messages": [
+    //         {"role": "system", "content": "You are a music recommendation engine."},
+    //         {"role": "user", "content": promptText},
+    //       ],
+    //       'max_tokens': 250,
+    //       'temperature': 0,
+    //       "top_p": 1,
+    //     },
+    //   ),
+    // );
+
     final response = await http.post(
-      Uri.parse('http://192.168.1.40:5000/generate'),
+      Uri.parse('http://192.168.1.40:5000/generate'), // ou ton IP publique si backend hébergé
       headers: {
         'Content-Type': 'application/json',
       },
@@ -86,9 +114,39 @@ class _PromptScreenState extends State<PromptScreen> {
       }),
     );
 
+    // Print
+    // print(response.body);
+
+    // if (response.statusCode == 200) {
+    //   final data = json.decode(response.body);
+    //   final choices = data['choices'] as List;
+    //   final playlistString =
+    //       choices.isNotEmpty ? choices[0]['message']['content'] as String : '';
+
+    //   setState(() {
+    //     // Split the playlist string by newline and then split each song by " - "
+    //     _playlist = playlistString.split('\n').map((song) {
+    //       final parts = song.split(' - ');
+    //       if (parts.length >= 2) {
+    //         return {'artist': parts[0].trim(), 'title': parts[1].trim()};
+    //       } else {
+    //         // Handle the case where song format is not as expected
+    //         return {'artist': 'Unknown Artist', 'title': 'Unknown Title'};
+    //       }
+    //     }).toList();
+    //     _isLoading = false;
+    //   });
+    // } else {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Failed to fetch playlist')),
+    //   );
+    // }
+
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print('API response body: ${response.body}');
       final songs = data['playlist'] as List<dynamic>;
 
       setState(() {
@@ -360,8 +418,26 @@ class _PromptScreenState extends State<PromptScreen> {
                           child: Stack(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  // Bouton retour à gauche
+                                  GestureDetector(
+                                    onTap: () {
+                                        _showFirstColumn(); // ou _showFirstColumn() selon ton besoin
+                                    },
+                                    child: Container(
+                                      height: 40.0,
+                                      width: 40.0,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFFFFFF),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Center(
+                                        child: Icon(Icons.arrow_back),
+                                      ),
+                                    ),
+                                  ),
+
                                   GestureDetector(
                                     onTap: () {
                                       showDialog(
@@ -586,7 +662,7 @@ class _PromptScreenState extends State<PromptScreen> {
                                                       .width *
                                                   0.5,
                                               child: Text(
-                                                song['artist']!,
+                                                song['artist']!.substring(3),
                                                 style: const TextStyle(
                                                   fontSize: 14.0,
                                                   fontWeight: FontWeight.w300,
