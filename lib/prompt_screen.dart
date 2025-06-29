@@ -83,45 +83,79 @@ class _PromptScreenState extends State<PromptScreen> {
     // print(dotenv.env['token']);
 
     // API call to get playlist recommendations
+    // final response = await http.post(
+    //   Uri.parse('https://api.openai.com/v1/chat/completions'),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer ${dotenv.env['token']}',
+    //   },
+    //   body: jsonEncode(
+    //     {
+    //       "model": "gpt-3.5-turbo-0125",
+    //       "messages": [
+    //         {"role": "system", "content": "You are a music recommendation engine."},
+    //         {"role": "user", "content": promptText},
+    //       ],
+    //       'max_tokens': 250,
+    //       'temperature': 0,
+    //       "top_p": 1,
+    //     },
+    //   ),
+    // );
+
     final response = await http.post(
-      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      Uri.parse('http://192.168.1.40:5000/generate'), // ou ton IP publique si backend hébergé
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${dotenv.env['token']}',
       },
-      body: jsonEncode(
-        {
-          "model": "gpt-3.5-turbo-0125",
-          "messages": [
-            {"role": "system", "content": "You are a music recommendation engine."},
-            {"role": "user", "content": promptText},
-          ],
-          'max_tokens': 250,
-          'temperature': 0,
-          "top_p": 1,
-        },
-      ),
+      body: jsonEncode({
+        'genres': _selectedGenres.join(', '),
+        'mood': _selectedMood,
+      }),
     );
 
     // Print
-    print(response.body);
+    // print(response.body);
+
+    // if (response.statusCode == 200) {
+    //   final data = json.decode(response.body);
+    //   final choices = data['choices'] as List;
+    //   final playlistString =
+    //       choices.isNotEmpty ? choices[0]['message']['content'] as String : '';
+
+    //   setState(() {
+    //     // Split the playlist string by newline and then split each song by " - "
+    //     _playlist = playlistString.split('\n').map((song) {
+    //       final parts = song.split(' - ');
+    //       if (parts.length >= 2) {
+    //         return {'artist': parts[0].trim(), 'title': parts[1].trim()};
+    //       } else {
+    //         // Handle the case where song format is not as expected
+    //         return {'artist': 'Unknown Artist', 'title': 'Unknown Title'};
+    //       }
+    //     }).toList();
+    //     _isLoading = false;
+    //   });
+    // } else {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Failed to fetch playlist')),
+    //   );
+    // }
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final choices = data['choices'] as List;
-      final playlistString =
-          choices.isNotEmpty ? choices[0]['message']['content'] as String : '';
+      final songs = data['playlist'] as List<dynamic>;
 
       setState(() {
-        // Split the playlist string by newline and then split each song by " - "
-        _playlist = playlistString.split('\n').map((song) {
-          final parts = song.split(' - ');
-          if (parts.length >= 2) {
-            return {'artist': parts[0].trim(), 'title': parts[1].trim()};
-          } else {
-            // Handle the case where song format is not as expected
-            return {'artist': 'Unknown Artist', 'title': 'Unknown Title'};
-          }
+        _playlist = songs.map<Map<String, String>>((song) {
+          final parts = (song as String).split(' - ');
+          return {
+            'artist': parts[0].trim(),
+            'title': parts.length > 1 ? parts[1].trim() : 'Unknown',
+          };
         }).toList();
         _isLoading = false;
       });
