@@ -19,23 +19,30 @@ def generate():
     f"Generate a list of 5 songs for a user based on:\n"
     f"- Mood: {mood}\n"
     f"- Genres: {genres}\n"
-    "- Prefer songs released between 2000 and 2025.\n"
     "Search online if needed. Return each song as a string in the format 'Artist - Title'."
     )
 
     # print(mood)
-    # print(genres)
+    print(genres)
 
     try:
         response = agent.run(prompt)
-        # S'assurer que la réponse est une liste de lignes
-        if isinstance(response, str):
+
+        print("MODEL RAW RESPONSE:\n", response)
+        
+        if isinstance(response, list):
+            playlist = response
+        
+        elif isinstance(response, str):
             playlist = [line.strip() for line in response.strip().split("\n") if " - " in line]
-            print(playlist)
         else:
             playlist = []
 
-        return jsonify({"playlist": playlist})
+        new_playlist = jsonify({"playlist": playlist})
+
+        print("JSONIFY :\n", new_playlist)
+        
+        return new_playlist
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
