@@ -6,3 +6,6 @@ flutter devices
 flutter emulators --launch <emulator_id>
 flutter run
 
+.\venv\Scripts\Activate
+ls lib/smolagents/
+python app.py
