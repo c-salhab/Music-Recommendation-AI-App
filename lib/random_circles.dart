@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
-// RandomCircles for moods starts here
 class RandomCircles extends StatefulWidget {
   final Function(String?, String?) onMoodSelected;
   const RandomCircles({super.key, required this.onMoodSelected});
@@ -13,8 +12,9 @@ class RandomCircles extends StatefulWidget {
 class _RandomCirclesState extends State<RandomCircles> {
   final Random random = Random();
   final ValueNotifier<String?> _selectedMood = ValueNotifier<String?>(null);
-  final ValueNotifier<String?> _selectedMoodImage =
-      ValueNotifier<String?>(null);
+  final ValueNotifier<String?> _selectedMoodImage = ValueNotifier<String?>(null);
+
+  late BuildContext scaffoldContext; // Pour accéder au ScaffoldMessenger
 
   final List<Map<String, String>> moodData = [
     {'mood': 'Happy', 'image': 'assets/images/happy.png'},
@@ -28,97 +28,112 @@ class _RandomCirclesState extends State<RandomCircles> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final List<Widget> circles = [];
-        final List<Rect> positions = [];
+    return Builder(
+      builder: (BuildContext context) {
+        scaffoldContext = context; // Capture du context pour le snackbar
 
-        for (int i = 0; i < moodData.length; i++) {
-          final double size = random.nextDouble() * 100 + 50;
-          double left, top;
-          Rect newPosition;
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final List<Widget> circles = [];
+            final List<Rect> positions = [];
 
-          bool doesOverlap;
-          int attempts = 0;
-          const int maxAttempts = 100;
+            for (int i = 0; i < moodData.length; i++) {
+              final double size = random.nextDouble() * 100 + 50;
+              double left, top;
+              Rect newPosition;
 
-          do {
-            left = random.nextDouble() * (constraints.maxWidth - size);
-            top = random.nextDouble() * (constraints.maxHeight - size);
-            newPosition = Rect.fromLTWH(left, top, size, size);
+              bool doesOverlap;
+              int attempts = 0;
+              const int maxAttempts = 100;
 
-            doesOverlap =
-                positions.any((position) => position.overlaps(newPosition));
-            attempts++;
-          } while (doesOverlap && attempts < maxAttempts);
+              do {
+                left = random.nextDouble() * (constraints.maxWidth - size);
+                top = random.nextDouble() * (constraints.maxHeight - size);
+                newPosition = Rect.fromLTWH(left, top, size, size);
+                doesOverlap = positions.any((position) => position.overlaps(newPosition));
+                attempts++;
+              } while (doesOverlap && attempts < maxAttempts);
 
-          if (attempts == maxAttempts) {
-            continue;
-          }
+              if (attempts == maxAttempts) {
+                continue;
+              }
 
-          positions.add(newPosition);
+              positions.add(newPosition);
 
-          Color color = Color.fromARGB(
-            255,
-            random.nextInt(256),
-            random.nextInt(256),
-            random.nextInt(256),
-          );
+              Color color = Color.fromARGB(
+                255,
+                random.nextInt(256),
+                random.nextInt(256),
+                random.nextInt(256),
+              );
 
-          circles.add(
-            Positioned(
-              left: left,
-              top: top,
-              child: ValueListenableBuilder<String?>(
-                valueListenable: _selectedMood,
-                builder: (context, selectedMood, child) {
-                  final bool isSelected = selectedMood == moodData[i]['mood'];
-                  final Color backgroundColor = isSelected
-                      ? const Color(0xFF0000FF)
-                      : const Color(0xFFFFCCCC).withOpacity(0.1);
+              circles.add(
+                Positioned(
+                  left: left,
+                  top: top,
+                  child: ValueListenableBuilder<String?>(
+                    valueListenable: _selectedMood,
+                    builder: (context, selectedMood, child) {
+                      final bool isSelected = selectedMood == moodData[i]['mood'];
+                      final Color backgroundColor = isSelected
+                          ? const Color(0xFF0000FF)
+                          : const Color(0xFFFFCCCC).withOpacity(0.1);
 
-                  return GestureDetector(
-                    onTap: () {
-                      _selectedMood.value =
-                          isSelected ? null : moodData[i]['mood'];
-                      _selectedMoodImage.value =
-                          isSelected ? null : moodData[i]['image'];
-                      widget.onMoodSelected(
-                          _selectedMood.value, _selectedMoodImage.value);
+                      return GestureDetector(
+                        onTap: () {
+                          final String? mood = isSelected ? null : moodData[i]['mood'];
+                          final String? image = isSelected ? null : moodData[i]['image'];
+                          _selectedMood.value = mood;
+                          _selectedMoodImage.value = image;
+                          widget.onMoodSelected(mood, image);
+
+                          if (mood != null) {
+                            ScaffoldMessenger.of(scaffoldContext).hideCurrentSnackBar();
+                            ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+                              SnackBar(
+                                content: Text(mood),
+                                duration: const Duration(seconds: 2),
+                                backgroundColor: const Color.fromARGB(221, 66, 66, 66),
+                                // behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 2.0,
+                              color: backgroundColor,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Container(
+                            width: size,
+                            height: size,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? const Color(0xFFFFCCCC).withOpacity(0.1)
+                                  : color,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Image.asset(
+                              moodData[i]['image']!,
+                              width: size * 0.8,
+                              height: size * 0.8,
+                            ),
+                          ),
+                        ),
+                      );
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 2.0,
-                          color: backgroundColor,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Container(
-                        width: size,
-                        height: size,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFFFFCCCC).withOpacity(0.1)
-                              : color,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Image.asset(
-                          moodData[i]['image']!,
-                          width: size * 0.8,
-                          height: size * 0.8,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        }
+                  ),
+                ),
+              );
+            }
 
-        return Stack(children: circles);
+            return Stack(children: circles);
+          },
+        );
       },
     );
   }
