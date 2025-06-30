@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:music_recommendation_ai_app/random_circles.dart';
 import 'dart:convert';
-
+import 'choose_artist.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PromptScreen extends StatefulWidget {
@@ -75,36 +75,8 @@ class _PromptScreenState extends State<PromptScreen> {
       _isLoading = true;
     });
 
-    // Construct the prompt text using the selected mood and genres
-    final promptText = 'I want just a listed music playlist for'
-        'Mood: $_selectedMood, Genres: ${_selectedGenres.join(', ')}'
-        'in the format artist, title';
-
-    // print(dotenv.env['token']);
-
-    // API call to get playlist recommendations
-    // final response = await http.post(
-    //   Uri.parse('https://api.openai.com/v1/chat/completions'),
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': 'Bearer ${dotenv.env['token']}',
-    //   },
-    //   body: jsonEncode(
-    //     {
-    //       "model": "gpt-3.5-turbo-0125",
-    //       "messages": [
-    //         {"role": "system", "content": "You are a music recommendation engine."},
-    //         {"role": "user", "content": promptText},
-    //       ],
-    //       'max_tokens': 250,
-    //       'temperature': 0,
-    //       "top_p": 1,
-    //     },
-    //   ),
-    // );
-
     final response = await http.post(
-      Uri.parse('http://192.168.1.40:5000/generate'), // ou ton IP publique si backend hébergé
+      Uri.parse('http://192.168.1.40:5000/generate'), 
       headers: {
         'Content-Type': 'application/json',
       },
@@ -113,37 +85,6 @@ class _PromptScreenState extends State<PromptScreen> {
         'mood': _selectedMood,
       }),
     );
-
-    // Print
-    // print(response.body);
-
-    // if (response.statusCode == 200) {
-    //   final data = json.decode(response.body);
-    //   final choices = data['choices'] as List;
-    //   final playlistString =
-    //       choices.isNotEmpty ? choices[0]['message']['content'] as String : '';
-
-    //   setState(() {
-    //     // Split the playlist string by newline and then split each song by " - "
-    //     _playlist = playlistString.split('\n').map((song) {
-    //       final parts = song.split(' - ');
-    //       if (parts.length >= 2) {
-    //         return {'artist': parts[0].trim(), 'title': parts[1].trim()};
-    //       } else {
-    //         // Handle the case where song format is not as expected
-    //         return {'artist': 'Unknown Artist', 'title': 'Unknown Title'};
-    //       }
-    //     }).toList();
-    //     _isLoading = false;
-    //   });
-    // } else {
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text('Failed to fetch playlist')),
-    //   );
-    // }
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -418,8 +359,26 @@ class _PromptScreenState extends State<PromptScreen> {
                           child: Stack(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  // Bouton retour à gauche
+                                  GestureDetector(
+                                    onTap: () {
+                                        _showFirstColumn();
+                                    },
+                                    child: Container(
+                                      height: 40.0,
+                                      width: 40.0,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFFFFFF),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Center(
+                                        child: Icon(Icons.arrow_back),
+                                      ),
+                                    ),
+                                  ),
+
                                   GestureDetector(
                                     onTap: () {
                                       showDialog(
@@ -461,23 +420,23 @@ class _PromptScreenState extends State<PromptScreen> {
                                                   width: 8.0,
                                                 ),
                                                 // Audiomack container
-                                                GestureDetector(
-                                                  onTap: _openAudiomack,
-                                                  child: Container(
-                                                    height: 50.0,
-                                                    width: 50.0,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(
-                                                        image: AssetImage(
-                                                          "assets/images/audiomack.png",
-                                                        ),
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
+                                                // GestureDetector(
+                                                //   onTap: _openAudiomack,
+                                                //   child: Container(
+                                                //     height: 50.0,
+                                                //     width: 50.0,
+                                                //     decoration:
+                                                //         const BoxDecoration(
+                                                //       shape: BoxShape.circle,
+                                                //       image: DecorationImage(
+                                                //         image: AssetImage(
+                                                //           "assets/images/audiomack.png",
+                                                //         ),
+                                                //         fit: BoxFit.cover,
+                                                //       ),
+                                                //     ),
+                                                //   ),
+                                                // ),
                                               ],
                                             ),
                                           );
@@ -644,7 +603,7 @@ class _PromptScreenState extends State<PromptScreen> {
                                                       .width *
                                                   0.5,
                                               child: Text(
-                                                song['artist']!.substring(3),
+                                                song['artist']!,
                                                 style: const TextStyle(
                                                   fontSize: 14.0,
                                                   fontWeight: FontWeight.w300,
@@ -700,7 +659,12 @@ class _PromptScreenState extends State<PromptScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100.0),
                 ),
-                onPressed: _showFirstColumn,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChooseArtistScreen()),
+                  );
+                },
                 child: const Icon(
                   Icons.add_outlined,
                 ),

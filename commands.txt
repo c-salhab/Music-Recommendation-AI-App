@@ -3,7 +3,7 @@ Commands to launch to use Virtual Device on VS code
 flutter devices
 
 flutter devices
-flutter emulators --launch <emulator_id>
+flutter emulators --launch Pixel_9_Pro_XL
 flutter run
 
 .\venv\Scripts\Activate
