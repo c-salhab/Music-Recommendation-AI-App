@@ -76,6 +76,38 @@ def generate_by_artist():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/generate_mood_artist", methods=["POST"])
+def generate_mood_artist():
+    data = request.get_json()
+    artist = data.get("artist")
+    mood = data.get("mood")
+    genres = data.get("genres")
+
+    if not artist or not mood or not genres:
+        return jsonify({"error": "Missing artist, mood or genres"}), 400
+
+    prompt = (
+        f"Create a playlist of 5 songs from the artist '{artist}' "
+        f"that matches this mood: '{mood}' and these genres: '{genres}'.\n"
+        "Return each song in the format: 'Artist - Title'.\n"
+    )
+
+    try:
+        response = agent.run(prompt)
+
+        print("MODEL RAW RESPONSE:\n", response)
+
+        if isinstance(response, list):
+            playlist = response
+        elif isinstance(response, str):
+            playlist = [line.strip() for line in response.strip().split("\n") if " - " in line]
+        else:
+            playlist = []
+
+        return jsonify({"playlist": playlist})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

@@ -6,16 +6,18 @@ import 'package:music_recommendation_ai_app/random_circles.dart';
 import 'dart:convert';
 import 'choose_artist.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'choose_artist_mood.dart';
 
-class PromptScreen extends StatefulWidget {
-  final VoidCallback showHomeScreen;
-  const PromptScreen({super.key, required this.showHomeScreen});
+class ChooseMoodArtistScreen extends StatefulWidget {
+
+  final bool showHomeScreen;
+  const ChooseMoodArtistScreen({super.key, this.showHomeScreen = false});
 
   @override
-  State<PromptScreen> createState() => _PromptScreenState();
+  State<ChooseMoodArtistScreen> createState() => _ChooseMoodArtistScreenState();
 }
 
-class _PromptScreenState extends State<PromptScreen> {
+class _ChooseMoodArtistScreenState extends State<ChooseMoodArtistScreen> {
   // Genre list
   final List<String> genres = [
     'Jazz',
@@ -316,7 +318,24 @@ class _PromptScreenState extends State<PromptScreen> {
 
                                   // Container for submit button in GestureDetector
                                   child: GestureDetector(
-                                    onTap: _submitSelections,
+                                    onTap: () {
+                                      if (_selectedMood == null || _selectedGenres.isEmpty) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Please select a mood and at least one genre')),
+                                        );
+                                        return;
+                                      }
+
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChooseArtistMoodScreen(
+                                            selectedMood: _selectedMood!,
+                                            selectedGenres: _selectedGenres.toList(),
+                                          ),
+                                        ),
+                                      );
+                                    },
 
                                     // Container for submit button
                                     child: Container(
@@ -332,7 +351,7 @@ class _PromptScreenState extends State<PromptScreen> {
                                       child: Center(
                                         // Submit text here
                                         child: Text(
-                                          'Submit',
+                                          'Choose Artist',
                                           style: GoogleFonts.inter(
                                             fontSize: 14.0,
                                             fontWeight: FontWeight.bold,
@@ -647,29 +666,40 @@ class _PromptScreenState extends State<PromptScreen> {
         ),
       ),
       floatingActionButton: _playlist.isEmpty
-          ? Container()
-          : Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFCCCC).withOpacity(0.3),
-                shape: BoxShape.circle,
-              ),
-              child: FloatingActionButton(
-                backgroundColor: const Color(0xFFFFFFFF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100.0),
+    ? Container()
+    : Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFCCCC).withOpacity(0.3),
+          shape: BoxShape.circle,
+        ),
+        child: FloatingActionButton(
+          backgroundColor: const Color(0xFFFFFFFF),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100.0),
+          ),
+          onPressed: () {
+            if (_selectedMood == null || _selectedGenres.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Please select a mood and at least one genre')),
+              );
+              return;
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChooseArtistMoodScreen(
+                  selectedMood: _selectedMood!,
+                  selectedGenres: _selectedGenres.toList(),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ChooseArtistScreen()),
-                  );
-                },
-                child: const Icon(
-                  Icons.add_outlined,
-                ),
               ),
-            ),
+            );
+          },
+          child: const Icon(
+            Icons.add_outlined,
+          ),
+        ),
+      ),
     );
   }
 }

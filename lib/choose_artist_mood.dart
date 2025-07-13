@@ -2,18 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:music_recommendation_ai_app/choose_mood_artist.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'choose_artist_mood.dart';
 
-class ChooseArtistScreen extends StatefulWidget {
-  const ChooseArtistScreen({super.key});
+class ChooseArtistMoodScreen extends StatefulWidget {
+  final String selectedMood;
+  final List<String> selectedGenres;
+
+  const ChooseArtistMoodScreen({
+    super.key,
+    required this.selectedMood,
+    required this.selectedGenres,
+  });
 
   @override
-  State<ChooseArtistScreen> createState() => _ChooseArtistScreenState();
+  State<ChooseArtistMoodScreen> createState() => _ChooseArtistMoodScreenState();
 }
 
-class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
+class _ChooseArtistMoodScreenState extends State<ChooseArtistMoodScreen> {
   String _artistName = '';
   bool _isLoading = false;
   bool _searchSubmitted = false;
@@ -30,9 +35,13 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.40:5000/generate_by_artist'),
+        Uri.parse('http://192.168.1.40:5000/generate_mood_artist'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'artist': _artistName}),
+        body: jsonEncode({
+          'artist': _artistName,
+          'genres': widget.selectedGenres.join(', '),
+          'mood': widget.selectedMood,
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -74,14 +83,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
   Future<void> _openSpotify() async {
     final query = _playlist.map((s) => '${s['artist']} - ${s['title']}').join(', ');
     final url = Uri.parse('https://open.spotify.com/search/$query');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Future<void> _openAudiomack() async {
-    final query = _playlist.map((s) => '${s['artist']} - ${s['title']}').join(', ');
-    final url = Uri.parse('https://audiomack.com/search/$query');
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
@@ -132,25 +133,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                 : !_searchSubmitted
                     ? Column(
                         children: [
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.start,
-                          //   children: [
-                          //     GestureDetector(
-                          //       onTap: () => Navigator.pop(context),
-                          //       child: Container(
-                          //         height: 40.0,
-                          //         width: 40.0,
-                          //         decoration: const BoxDecoration(
-                          //           color: Color(0xFFFFFFFF),
-                          //           shape: BoxShape.circle,
-                          //         ),
-                          //         child: const Center(
-                          //           child: Icon(Icons.arrow_back, color: Colors.black),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -168,66 +150,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                   ),
                                 ),
                               ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     showDialog(
-                              //       context: context,
-                              //       builder: (context) => AlertDialog(
-                              //         title: Center(
-                              //           child: Text(
-                              //             'Create Playlist on?',
-                              //             style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
-                              //           ),
-                              //         ),
-                              //         content: Row(
-                              //           mainAxisAlignment: MainAxisAlignment.center,
-                              //           children: [
-                              //             GestureDetector(
-                              //               onTap: _openSpotify,
-                              //               child: Container(
-                              //                 height: 50,
-                              //                 width: 50,
-                              //                 decoration: const BoxDecoration(
-                              //                   shape: BoxShape.circle,
-                              //                   image: DecorationImage(
-                              //                     image: AssetImage("assets/images/spotify.png"),
-                              //                     fit: BoxFit.cover,
-                              //                   ),
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //             const SizedBox(width: 12),
-                              //             // GestureDetector(
-                              //             //   onTap: _openAudiomack,
-                              //             //   child: Container(
-                              //             //     height: 50,
-                              //             //     width: 50,
-                              //             //     decoration: const BoxDecoration(
-                              //             //       shape: BoxShape.circle,
-                              //             //       image: DecorationImage(
-                              //             //         image: AssetImage("assets/images/audiomack.png"),
-                              //             //         fit: BoxFit.cover,
-                              //             //       ),
-                              //             //     ),
-                              //             //   ),
-                              //             // ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     );
-                              //   },
-                              //   child: Container(
-                              //     height: 40,
-                              //     width: 40,
-                              //     decoration: const BoxDecoration(
-                              //       color: Colors.white,
-                              //       shape: BoxShape.circle,
-                              //     ),
-                              //     child: const Center(
-                              //       child: Icon(Icons.playlist_add_rounded, color: Colors.black),
-                              //     ),
-                              //   ),
-                              // ),
                             ],
                           ),
                           Expanded(
@@ -343,25 +265,11 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          // GestureDetector(
-                                          //   onTap: _openAudiomack,
-                                          //   child: Container(
-                                          //     height: 50,
-                                          //     width: 50,
-                                          //     decoration: const BoxDecoration(
-                                          //       shape: BoxShape.circle,
-                                          //       image: DecorationImage(
-                                          //         image: AssetImage("assets/images/audiomack.png"),
-                                          //         fit: BoxFit.cover,
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
                                         ],
                                       ),
                                     ),
                                   );
-                                },
+                              },
                                 child: Container(
                                   height: 40,
                                   width: 40,
@@ -453,27 +361,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
           ),
         ),
       ),
-      floatingActionButton: _playlist.isEmpty
-    ? Container()
-    : FloatingActionButton(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ChooseMoodArtistScreen(showHomeScreen: true),
-            ),
-          );
-        },
-        child: const Icon(
-          Icons.arrow_forward_ios,
-          color: Colors.black,
-        ),
-      ),
     );
   }
-  
 }
