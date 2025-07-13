@@ -3,7 +3,7 @@ from smolagents import CodeAgent, DuckDuckGoSearchTool, InferenceClientModel
 
 app = Flask(__name__)
 
-# Crée l'agent avec modèle + outil de recherche web
+
 agent = CodeAgent(
     tools=[DuckDuckGoSearchTool()],
     model=InferenceClientModel(model_id="Qwen/Qwen2.5-Coder-32B-Instruct")
@@ -79,4 +79,3 @@ def generate_by_artist():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
-

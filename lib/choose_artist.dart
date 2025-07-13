@@ -28,7 +28,7 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.40:5000/generate_by_artist'),
+        Uri.parse('http://172.20.10.5:5000/generate_by_artist'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'artist': _artistName}),
       );

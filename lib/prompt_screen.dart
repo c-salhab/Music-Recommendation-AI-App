@@ -76,7 +76,7 @@ class _PromptScreenState extends State<PromptScreen> {
     });
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.40:5000/generate'), 
+      Uri.parse('http://172.20.10.5:5000/generate'), 
       headers: {
         'Content-Type': 'application/json',
       },
