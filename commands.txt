@@ -1,11 +1,18 @@
-Commands to launch to use Virtual Device on VS code
+run python code :
+.\venv\Scripts\Activate
+cd .\lib\smolagents\
+python .\app.py
 
-flutter devices
-
-flutter devices
+run flutter code :
 flutter emulators --launch Pixel_9_Pro_XL
 flutter run
 
-.\venv\Scripts\Activate
-ls lib/smolagents/
-python app.py
+run ngrok :
+ngrok config add-authtoken YOUR_AUTH_TOKEN
+(Find your AUTH_TOKEN on your ngrok dashboard: https://dashboard.ngrok.com/get-started/setup)
+ngrok http 5000
+
+*** change ip in : ***
+prompt_screen.dart
+choose_artist.dart
+choose_artist_mood.dart

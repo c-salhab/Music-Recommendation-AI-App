@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:music_recommendation_ai_app/choose_mood_artist.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'choose_artist_mood.dart';
 
 class ChooseArtistScreen extends StatefulWidget {
   const ChooseArtistScreen({super.key});
@@ -71,20 +70,31 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
     });
   }
 
-  Future<void> _openSpotify() async {
-    final query = _playlist.map((s) => '${s['artist']} - ${s['title']}').join(', ');
-    final url = Uri.parse('https://open.spotify.com/search/$query');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-  }
+  Future<void> _createSpotifyPlaylist() async {
+      final trackTitles = _playlist.map((song) => song['title']!).toList();
+      final response = await http.post(
+        Uri.parse('http://192.168.1.40:5000/create_playlist'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'tracks': trackTitles,
+          'playlist_name': 'Moodify Artist Playlist',
+        }),
+      );
 
-  Future<void> _openAudiomack() async {
-    final query = _playlist.map((s) => '${s['artist']} - ${s['title']}').join(', ');
-    final url = Uri.parse('https://audiomack.com/search/$query');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final playlistUrl = data['playlist_url'];
+        final url = Uri.parse(playlistUrl);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
+        } else {
+          throw 'Could not launch $playlistUrl';
+        }
+      } else {
+        print('Failed to create playlist');
+      }
   }
 
   String capitalizeEachWord(String input) {
@@ -132,25 +142,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                 : !_searchSubmitted
                     ? Column(
                         children: [
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.start,
-                          //   children: [
-                          //     GestureDetector(
-                          //       onTap: () => Navigator.pop(context),
-                          //       child: Container(
-                          //         height: 40.0,
-                          //         width: 40.0,
-                          //         decoration: const BoxDecoration(
-                          //           color: Color(0xFFFFFFFF),
-                          //           shape: BoxShape.circle,
-                          //         ),
-                          //         child: const Center(
-                          //           child: Icon(Icons.arrow_back, color: Colors.black),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -168,66 +159,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                   ),
                                 ),
                               ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     showDialog(
-                              //       context: context,
-                              //       builder: (context) => AlertDialog(
-                              //         title: Center(
-                              //           child: Text(
-                              //             'Create Playlist on?',
-                              //             style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
-                              //           ),
-                              //         ),
-                              //         content: Row(
-                              //           mainAxisAlignment: MainAxisAlignment.center,
-                              //           children: [
-                              //             GestureDetector(
-                              //               onTap: _openSpotify,
-                              //               child: Container(
-                              //                 height: 50,
-                              //                 width: 50,
-                              //                 decoration: const BoxDecoration(
-                              //                   shape: BoxShape.circle,
-                              //                   image: DecorationImage(
-                              //                     image: AssetImage("assets/images/spotify.png"),
-                              //                     fit: BoxFit.cover,
-                              //                   ),
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //             const SizedBox(width: 12),
-                              //             // GestureDetector(
-                              //             //   onTap: _openAudiomack,
-                              //             //   child: Container(
-                              //             //     height: 50,
-                              //             //     width: 50,
-                              //             //     decoration: const BoxDecoration(
-                              //             //       shape: BoxShape.circle,
-                              //             //       image: DecorationImage(
-                              //             //         image: AssetImage("assets/images/audiomack.png"),
-                              //             //         fit: BoxFit.cover,
-                              //             //       ),
-                              //             //     ),
-                              //             //   ),
-                              //             // ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     );
-                              //   },
-                              //   child: Container(
-                              //     height: 40,
-                              //     width: 40,
-                              //     decoration: const BoxDecoration(
-                              //       color: Colors.white,
-                              //       shape: BoxShape.circle,
-                              //     ),
-                              //     child: const Center(
-                              //       child: Icon(Icons.playlist_add_rounded, color: Colors.black),
-                              //     ),
-                              //   ),
-                              // ),
                             ],
                           ),
                           Expanded(
@@ -329,7 +260,7 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           GestureDetector(
-                                            onTap: _openSpotify,
+                                            onTap: _createSpotifyPlaylist,
                                             child: Container(
                                               height: 50,
                                               width: 50,
@@ -343,20 +274,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          // GestureDetector(
-                                          //   onTap: _openAudiomack,
-                                          //   child: Container(
-                                          //     height: 50,
-                                          //     width: 50,
-                                          //     decoration: const BoxDecoration(
-                                          //       shape: BoxShape.circle,
-                                          //       image: DecorationImage(
-                                          //         image: AssetImage("assets/images/audiomack.png"),
-                                          //         fit: BoxFit.cover,
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
                                         ],
                                       ),
                                     ),
@@ -475,5 +392,4 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
       ),
     );
   }
-  
 }

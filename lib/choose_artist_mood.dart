@@ -80,12 +80,31 @@ class _ChooseArtistMoodScreenState extends State<ChooseArtistMoodScreen> {
     });
   }
 
-  Future<void> _openSpotify() async {
-    final query = _playlist.map((s) => '${s['artist']} - ${s['title']}').join(', ');
-    final url = Uri.parse('https://open.spotify.com/search/$query');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
+  Future<void> _createSpotifyPlaylist() async {
+      final trackTitles = _playlist.map((song) => song['title']!).toList();
+      final response = await http.post(
+        Uri.parse('http://192.168.1.40:5000/create_playlist'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'tracks': trackTitles,
+          'playlist_name': 'Moodify Mood-Artist Playlist',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final playlistUrl = data['playlist_url'];
+        final url = Uri.parse(playlistUrl);
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
+        } else {
+          throw 'Could not launch $playlistUrl';
+        }
+      } else {
+        print('Failed to create playlist');
+      }
   }
 
   String capitalizeEachWord(String input) {
@@ -251,7 +270,7 @@ class _ChooseArtistMoodScreenState extends State<ChooseArtistMoodScreen> {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           GestureDetector(
-                                            onTap: _openSpotify,
+                                            onTap: _createSpotifyPlaylist,
                                             child: Container(
                                               height: 50,
                                               width: 50,
