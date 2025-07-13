@@ -16,3 +16,10 @@ ngrok http 5000
 prompt_screen.dart
 choose_artist.dart
 choose_artist_mood.dart
+
+terraform : 
+cd .\terraform\
+terraform init
+terraform plan
+terraform apply
+terraform destroy
