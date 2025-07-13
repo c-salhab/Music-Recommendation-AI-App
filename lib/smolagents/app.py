@@ -17,22 +17,34 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.getenv('SPOTIPY_CLIE
 user = sp.current_user()
 print(f"Authenticated as {user['display_name']}")
 
-def search_tracks(track_names):
+def search_tracks(track_names, artist_names=None):
     track_ids = []
-    for track_name in track_names:
-        result = sp.search(track_name, type="track", limit=1)
-        if result["tracks"]["items"]:
-            track_ids.append(result["tracks"]["items"][0]["id"])  # Extract the track ID
-        else:
-            print(f"Track '{track_name}' not found.")
-    return track_ids
 
-def create_playlist(track_ids):
-    user_id = sp.current_user()["id"]
-    playlist_name = "Moodify-Playlist"
-    playlist = sp.user_playlist_create(user=user_id, name=playlist_name, public=False)
-    sp.user_playlist_add_tracks(user=user_id, playlist_id=playlist["id"], tracks=track_ids)
-    print(f"Playlist '{playlist_name}' created successfully!")
+    for i, track_name in enumerate(track_names):
+        artist = artist_names[i] if artist_names and i < len(artist_names) else None
+
+        query = f"track:{track_name}"
+        if artist:
+            query += f" artist:{artist}"
+
+        print(f"\nSearching Spotify with query: '{query}'")
+
+        result = sp.search(q=query, type="track", limit=1)
+        tracks = result.get("tracks", {}).get("items", [])
+
+        print(f"Raw Spotify Response for '{track_name}' / '{artist}':")
+        for t in tracks:
+            print(f"- Found: {t['name']} by {t['artists'][0]['name']} (ID: {t['id']})")
+
+        if tracks:
+            track_id = tracks[0]["id"]
+            track_ids.append(track_id)
+            print(f"Using track ID: {track_id}")
+        else:
+            print(f"Track not found for query: '{query}'")
+
+    print(f"\nFinal track IDs collected: {track_ids}")
+    return track_ids
 
 agent = CodeAgent(
     tools=[DuckDuckGoSearchTool()],
@@ -142,10 +154,11 @@ def generate_mood_artist():
 @app.route('/create_playlist', methods=['POST'])
 def create_playlist():
     data = request.get_json()
+    artist_names = data.get('artists', [])
     track_names = data.get('tracks', [])
     playlist_name = data.get('playlist_name', 'My Playlist')
     user_id = sp.current_user()['id']
-    track_ids = search_tracks(track_names)
+    track_ids = search_tracks(track_names, artist_names)
     playlist = sp.user_playlist_create(user=user_id, name=playlist_name, public=False)
     sp.playlist_add_items(playlist_id=playlist['id'], items=track_ids)
     return jsonify({'playlist_url': playlist['external_urls']['spotify']})

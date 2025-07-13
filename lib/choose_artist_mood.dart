@@ -81,30 +81,33 @@ class _ChooseArtistMoodScreenState extends State<ChooseArtistMoodScreen> {
   }
 
   Future<void> _createSpotifyPlaylist() async {
-      final trackTitles = _playlist.map((song) => song['title']!).toList();
-      final response = await http.post(
-        Uri.parse('http://192.168.1.40:5000/create_playlist'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'tracks': trackTitles,
-          'playlist_name': 'Moodify Mood-Artist Playlist',
-        }),
-      );
+    final trackTitles = _playlist.map((song) => song['title']!).toList();
+    final artistNames = _playlist.map((song) => song['artist']!).toList();
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final playlistUrl = data['playlist_url'];
-        final url = Uri.parse(playlistUrl);
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url);
-        } else {
-          throw 'Could not launch $playlistUrl';
-        }
+    final response = await http.post(
+      Uri.parse('http://192.168.1.40:5000/create_playlist'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'tracks': trackTitles,
+        'artists': artistNames,
+        'playlist_name': 'Moodify Mood-Artist Playlist',
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final playlistUrl = data['playlist_url'];
+      final url = Uri.parse(playlistUrl);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
       } else {
-        print('Failed to create playlist');
+        throw 'Could not launch $playlistUrl';
       }
+    } else {
+      print('Failed to create playlist');
+    }
   }
 
   String capitalizeEachWord(String input) {
