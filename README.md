@@ -6,8 +6,8 @@ A mobile app that recommends music playlists based on the mood and genres select
 📋 Key Features:
 1. 🎭 Single-select mood category 
 2. 🎶 Multi-select genre category
-3. Ability to choose a specific artist
-5. 🎧 Create and add playlists to Spotify with a click of a button
+3. 🎤 Ability to choose a specific artist
+4. 🎧 Create and add playlists to Spotify with a click of a button
 
 🛠️ Tech and Tech Stack:
 - Flutter
