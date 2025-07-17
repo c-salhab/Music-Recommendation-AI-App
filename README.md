@@ -6,12 +6,12 @@ A mobile app that recommends music playlists based on the mood and genres select
 📋 Key Features:
 1. 🎭 Single-select mood category 
 2. 🎶 Multi-select genre category
-3. 🔄 Regenerate playlist with a single tap
-4. 🎧 Create and add playlists to Spotify with a click of a button
+3. Ability to choose a specific artist
+5. 🎧 Create and add playlists to Spotify with a click of a button
 
 🛠️ Tech and Tech Stack:
 - Flutter
-- OpenAI / OpenAI API
+- SmolAgents
 - Spotify / Spotify API / Spotipy
 
 📚 Project Scope: This project was completed as part of the annual project for the 4th year at ESGI.
