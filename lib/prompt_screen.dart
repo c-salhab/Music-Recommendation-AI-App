@@ -22,16 +22,16 @@ class _PromptScreenState extends State<PromptScreen> {
     'Rock',
     'Amapiano',
     'R&B',
-    'Latin',
     'Hip-Hop',
     'Hip-Life',
     'Reggae',
-    'Gospel',
     'Afrobeat',
     'Blues',
-    'Country',
     'Punk',
     'Pop',
+    'Classical',
+    'Metal',
+    'Reggaeton',
   ];
 
   // Selected genres list
@@ -76,7 +76,7 @@ class _PromptScreenState extends State<PromptScreen> {
     });
 
     final response = await http.post(
-      Uri.parse('http://192.168.1.40:5000/generate'), 
+      Uri.parse('http://10.234.76.137:5000/generate'), 
       headers: {
         'Content-Type': 'application/json',
       },

@@ -1,176 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'choose_artist.dart';
+import 'prompt_screen.dart';
+import 'choose_artist_mood_genre.dart';
+import 'package:music_recommendation_ai_app/random_circles.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   final VoidCallback showPromptScreen;
+
   const HomeScreen({super.key, required this.showPromptScreen});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // container for contents
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF330000),
-              Color(0xFF000000),
-            ],
+      backgroundColor: const Color.fromARGB(255, 17, 17, 17),
+      appBar: AppBar(
+        title: const Text(
+          'Music Playlist Generator',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            onPressed: showPromptScreen,
+            icon: const Icon(Icons.music_note, color: Colors.white),
           ),
-        ),
-
-        // column starts here
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // first expanded
-            Expanded(
-              flex: 3,
-
-              // padding around the stack for image container
-              child: Padding(
-                padding: const EdgeInsets.only(top: 40.0),
-                // stack starts here
-                child: Stack(
-                  children: [
-                    // container for image
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(
-                            "assets/images/sonnet.png",
-                          ),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          IgnorePointer(
+            ignoring: true,
+            child: RandomCircles(
+              onMoodSelected: (_, __) {},
+            ),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: showPromptScreen,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
                     ),
-
-                    // padding for container stacked at the botttom of image
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 40.0),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-
-                        // container stacked at bottom of image
-                        child: Container(
-                          padding: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color(0xFFFFFFFF),
-                              width: 0.4,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Container(
-                            height: 110.0,
-                            width: 110.0,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFFFFFF),
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage(
-                                  "assets/images/moodify.png",
-                                ),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                    child: const Text('Generate by Mood & Genre'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChooseArtistScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
                     ),
-                  ],
-                ),
-                // stack ends here
+                    child: const Text('Generate by Artist'),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ArtistMoodGenreScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                    ),
+                    child: const Text('Generate by Artist + Mood + Genre'),
+                  ),
+                ],
               ),
             ),
-
-            // second expanded
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 15.0),
-                // column starts here
-                child: Column(
-                  children: [
-                    // richtext here
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: GoogleFonts.inter(
-                          height: 1.3,
-                        ),
-                        children: const <TextSpan>[
-                          TextSpan(
-                            text:
-                                'Moodify, AI-powered playlists tuned to your mood. \n',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w300,
-                              color: Color(0xFFFFFFFF),
-                            ),
-                          ),
-                          TextSpan(
-                            text: 'Get Started Now!',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFFFFFFF),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // richtext ends here
-
-                    // container for arrow forward in a padding
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20.0),
-
-                      // container for arrow forward
-                      child: GestureDetector(
-                        onTap: widget.showPromptScreen,
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFCCCC).withOpacity(0.3),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Container(
-                            height: 50.0,
-                            width: 50.0,
-                            padding: const EdgeInsets.all(2.0),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFFFFFFF),
-                              shape: BoxShape.circle,
-                            ),
-
-                            // arrow forward centered
-                            child: const Center(
-                              // arrow forward
-                              child: Icon(
-                                Icons.arrow_forward,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                // column ends here
-              ),
-            ),
-          ],
-        ),
-
-        // column ends here
+          ),
+        ],
       ),
     );
   }

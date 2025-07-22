@@ -1,0 +1,8 @@
+flask
+smol
+smolagents
+requests
+spotipy
+python-dotenv
+openai
+smol-dev

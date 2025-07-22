@@ -28,7 +28,7 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.40:5000/generate_by_artist'),
+        Uri.parse('http://10.234.76.137:5000/generate_by_artist'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'artist': _artistName}),
       );
@@ -130,25 +130,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                 : !_searchSubmitted
                     ? Column(
                         children: [
-                          // Row(
-                          //   mainAxisAlignment: MainAxisAlignment.start,
-                          //   children: [
-                          //     GestureDetector(
-                          //       onTap: () => Navigator.pop(context),
-                          //       child: Container(
-                          //         height: 40.0,
-                          //         width: 40.0,
-                          //         decoration: const BoxDecoration(
-                          //           color: Color(0xFFFFFFFF),
-                          //           shape: BoxShape.circle,
-                          //         ),
-                          //         child: const Center(
-                          //           child: Icon(Icons.arrow_back, color: Colors.black),
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -166,66 +147,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                   ),
                                 ),
                               ),
-                              // GestureDetector(
-                              //   onTap: () {
-                              //     showDialog(
-                              //       context: context,
-                              //       builder: (context) => AlertDialog(
-                              //         title: Center(
-                              //           child: Text(
-                              //             'Create Playlist on?',
-                              //             style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w500),
-                              //           ),
-                              //         ),
-                              //         content: Row(
-                              //           mainAxisAlignment: MainAxisAlignment.center,
-                              //           children: [
-                              //             GestureDetector(
-                              //               onTap: _openSpotify,
-                              //               child: Container(
-                              //                 height: 50,
-                              //                 width: 50,
-                              //                 decoration: const BoxDecoration(
-                              //                   shape: BoxShape.circle,
-                              //                   image: DecorationImage(
-                              //                     image: AssetImage("assets/images/spotify.png"),
-                              //                     fit: BoxFit.cover,
-                              //                   ),
-                              //                 ),
-                              //               ),
-                              //             ),
-                              //             const SizedBox(width: 12),
-                              //             // GestureDetector(
-                              //             //   onTap: _openAudiomack,
-                              //             //   child: Container(
-                              //             //     height: 50,
-                              //             //     width: 50,
-                              //             //     decoration: const BoxDecoration(
-                              //             //       shape: BoxShape.circle,
-                              //             //       image: DecorationImage(
-                              //             //         image: AssetImage("assets/images/audiomack.png"),
-                              //             //         fit: BoxFit.cover,
-                              //             //       ),
-                              //             //     ),
-                              //             //   ),
-                              //             // ),
-                              //           ],
-                              //         ),
-                              //       ),
-                              //     );
-                              //   },
-                              //   child: Container(
-                              //     height: 40,
-                              //     width: 40,
-                              //     decoration: const BoxDecoration(
-                              //       color: Colors.white,
-                              //       shape: BoxShape.circle,
-                              //     ),
-                              //     child: const Center(
-                              //       child: Icon(Icons.playlist_add_rounded, color: Colors.black),
-                              //     ),
-                              //   ),
-                              // ),
                             ],
                           ),
                           Expanded(
@@ -341,20 +262,6 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
                                             ),
                                           ),
                                           const SizedBox(width: 12),
-                                          // GestureDetector(
-                                          //   onTap: _openAudiomack,
-                                          //   child: Container(
-                                          //     height: 50,
-                                          //     width: 50,
-                                          //     decoration: const BoxDecoration(
-                                          //       shape: BoxShape.circle,
-                                          //       image: DecorationImage(
-                                          //         image: AssetImage("assets/images/audiomack.png"),
-                                          //         fit: BoxFit.cover,
-                                          //       ),
-                                          //     ),
-                                          //   ),
-                                          // ),
                                         ],
                                       ),
                                     ),
