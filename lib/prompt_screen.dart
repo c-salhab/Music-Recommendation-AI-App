@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:music_recommendation_ai_app/random_circles.dart';
@@ -48,17 +47,6 @@ class _PromptScreenState extends State<PromptScreen> {
 
   // Loading state
   bool _isLoading = false;
-
-  // Function for selected genre(s)
-  void _onGenreTap(String genre) {
-    setState(() {
-      if (_selectedGenres.contains(genre)) {
-        _selectedGenres.remove(genre);
-      } else {
-        _selectedGenres.add(genre);
-      }
-    });
-  }
 
   // Function to submit mood and genres and fetch playlist
   Future<void> _submitSelections() async {
@@ -110,27 +98,33 @@ class _PromptScreenState extends State<PromptScreen> {
     }
   }
 
-  Future<void> _openSpotify() async {
-    final playlistQuery = _playlist
-        .map((song) => '${song['artist']} - ${song['title']}')
-        .join(', ');
-    final url = Uri.parse('https://open.spotify.com/search/$playlistQuery');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+Future<void> _createSpotifyPlaylist() async {
+    final trackTitles = _playlist.map((song) => song['title']!).toList();
+    final artistNames = _playlist.map((song) => song['artist']!).toList();
 
-  Future<void> _openAudiomack() async {
-    final playlistQuery = _playlist
-        .map((song) => '${song['artist']} - ${song['title']}')
-        .join(', ');
-    final url = Uri.parse('https://audiomack.com/search/$playlistQuery');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+    final response = await http.post(
+      Uri.parse('http://192.168.1.40:5000/create_playlist'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'tracks': trackTitles,
+        'artists': artistNames,
+        'playlist_name': 'Moodify Mood Playlist',
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final playlistUrl = data['playlist_url'];
+      final url = Uri.parse(playlistUrl);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        throw 'Could not launch $playlistUrl';
+      }
     } else {
-      throw 'Could not launch $url';
+      print('Failed to create playlist');
     }
   }
 
@@ -400,7 +394,7 @@ class _PromptScreenState extends State<PromptScreen> {
                                               children: [
                                                 // spotify container
                                                 GestureDetector(
-                                                  onTap: _openSpotify,
+                                                  onTap: _createSpotifyPlaylist,
                                                   child: Container(
                                                     height: 50.0,
                                                     width: 50.0,
@@ -419,24 +413,6 @@ class _PromptScreenState extends State<PromptScreen> {
                                                 const SizedBox(
                                                   width: 8.0,
                                                 ),
-                                                // Audiomack container
-                                                // GestureDetector(
-                                                //   onTap: _openAudiomack,
-                                                //   child: Container(
-                                                //     height: 50.0,
-                                                //     width: 50.0,
-                                                //     decoration:
-                                                //         const BoxDecoration(
-                                                //       shape: BoxShape.circle,
-                                                //       image: DecorationImage(
-                                                //         image: AssetImage(
-                                                //           "assets/images/audiomack.png",
-                                                //         ),
-                                                //         fit: BoxFit.cover,
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // ),
                                               ],
                                             ),
                                           );
