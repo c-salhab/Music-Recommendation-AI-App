@@ -110,7 +110,7 @@ Future<void> _createSpotifyPlaylist() async {
       body: jsonEncode({
         'tracks': trackTitles,
         'artists': artistNames,
-        'playlist_name': 'Moodify Mood-Artist Playlist',
+        'playlist_name': 'Moodify Mood Playlist',
       }),
     );
 

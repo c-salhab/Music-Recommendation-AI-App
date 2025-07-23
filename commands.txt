@@ -23,3 +23,5 @@ terraform init
 terraform plan
 terraform apply
 terraform destroy
+
+ssh moodifyuser@<ip>

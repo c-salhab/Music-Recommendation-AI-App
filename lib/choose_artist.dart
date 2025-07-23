@@ -82,7 +82,7 @@ class _ChooseArtistScreenState extends State<ChooseArtistScreen> {
       body: jsonEncode({
         'tracks': trackTitles,
         'artists': artistNames,
-        'playlist_name': 'Moodify Mood-Artist Playlist',
+        'playlist_name': 'Moodify Artist Playlist',
       }),
     );
 
